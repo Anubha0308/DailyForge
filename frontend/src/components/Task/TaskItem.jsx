@@ -8,7 +8,12 @@ const priorityStyles = {
   High: "border-red-500 bg-red-50",
 };
 
-export default function TaskItem({ task, onToggleComplete, onDelete, onUpdate }) {
+export default function TaskItem({
+  task,
+  onToggleComplete,
+  onDelete,
+  onUpdate,
+}) {
   const isCompleted = task.status === "Completed";
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
@@ -53,13 +58,18 @@ export default function TaskItem({ task, onToggleComplete, onDelete, onUpdate })
             </p>
 
             <div className="flex items-center gap-4 mt-2 text-xs text-muted">
-              <span className="uppercase tracking-wide">{task.priority} priority</span>
+              <span className="uppercase tracking-wide">
+                {task.priority} priority
+              </span>
 
               {task.dueDate && (
                 <span className="flex items-center gap-1">
                   <Calendar size={12} />
                   {new Date(task.dueDate).toLocaleDateString()}
                 </span>
+              )}
+              {isCompleted && task.actualDuration != null && (
+                <span>Actual: {task.actualDuration}m</span>
               )}
             </div>
           </div>

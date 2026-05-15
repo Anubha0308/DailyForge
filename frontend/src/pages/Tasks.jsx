@@ -12,11 +12,37 @@ export default function Tasks() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingTask, setEditingTask] = useState(null);
 
+  const [durationModalTask, setDurationModalTask] = useState(null);
+  const [actualDuration, setActualDuration] = useState("");
+
   /** --- Handlers --- */
   const handleToggle = (task) => {
-    updateTask(task._id, {
-      status: task.status === "Completed" ? "Due" : "Completed",
+    if (task.status !== "Completed") {
+      setDurationModalTask(task);
+      setActualDuration("");
+    } else {
+      updateTask(task._id, {
+        status: "Due",
+        actualDuration: null,
+      });
+    }
+  };
+
+  const handleActualDurationSubmit = () => {
+    const durationValue = Number(actualDuration);
+
+    if (Number.isNaN(durationValue) || durationValue <= 0) {
+      alert("Please enter a valid duration in minutes");
+      return;
+    }
+
+    updateTask(durationModalTask._id, {
+      status: "Completed",
+      actualDuration: durationValue,
     });
+
+    setDurationModalTask(null);
+    setActualDuration("");
   };
 
   const handleSubmit = async (data) => {
@@ -52,7 +78,7 @@ export default function Tasks() {
   });
 
   const highPriorityCount = tasks.filter(
-    (t) => t.priority === "High" && t.status !== "Completed"
+    (t) => t.priority === "High" && t.status !== "Completed",
   ).length;
   const isOverloaded = highPriorityCount >= 3;
 
@@ -186,6 +212,49 @@ export default function Tasks() {
           onClose={() => setIsModalOpen(false)}
           onSubmit={handleSubmit}
         />
+      )}
+
+      {durationModalTask && (
+        <div className="fixed inset-0 bg-black/10 flex items-center justify-center z-50">
+          <div className="bg-white rounded-2xl shadow-xl w-full max-w-sm p-6">
+            <h2 className="text-xl font-semibold text-main mb-2">
+              Complete Task
+            </h2>
+
+            <p className="text-sm text-muted mb-4">
+              How long did you actually take to complete "
+              {durationModalTask.title}"?
+            </p>
+
+            <input
+              type="number"
+              min="1"
+              value={actualDuration}
+              onChange={(e) => setActualDuration(e.target.value)}
+              className="w-full p-2 border border-soft rounded-lg"
+              placeholder="Actual duration in minutes"
+            />
+
+            <div className="flex justify-end gap-3 mt-5">
+              <button
+                onClick={() => {
+                  setDurationModalTask(null);
+                  setActualDuration("");
+                }}
+                className="px-4 py-2 rounded-lg border border-soft"
+              >
+                Cancel
+              </button>
+
+              <button
+                onClick={handleActualDurationSubmit}
+                className="btn btn-primary px-4 py-2"
+              >
+                Mark Completed
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );
