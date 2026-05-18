@@ -69,7 +69,9 @@ export default function TaskItem({
                 </span>
               )}
               {isCompleted && task.actualDuration != null && (
+                
                 <span>Actual: {task.actualDuration}m</span>
+
               )}
             </div>
           </div>
